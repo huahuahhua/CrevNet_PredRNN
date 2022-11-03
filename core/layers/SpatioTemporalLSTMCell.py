@@ -11,8 +11,8 @@ class SpatioTemporalLSTMCell(nn.Module):
         self.kernel_size = configs.filter_size
         self.padding = (self.kernel_size[0] // 2, self.kernel_size[1] // 2)
         self.device = configs.device
-        self.width = configs.img_width // configs.patch_size // configs.sr_size
-        self.height = configs.img_height // configs.patch_size // configs.sr_size
+        self.width = configs.img_width // configs.patch_size // configs.sr_size // 2
+        self.height = configs.img_height // configs.patch_size // configs.sr_size // 2
 
         self._forget_bias = 1.0
 
@@ -27,11 +27,11 @@ class SpatioTemporalLSTMCell(nn.Module):
             )
             self.conv_m = nn.Sequential(
                 nn.Conv2d(hidden_dim, hidden_dim * 3, kernel_size=self.kernel_size, padding=self.padding, bias=False),
-                nn.LayerNorm([hidden_dim * 3,self.height, self.width])
+                nn.LayerNorm([hidden_dim * 3, self.height, self.width])
             )
             self.conv_o = nn.Sequential(
                 nn.Conv2d(hidden_dim * 2, hidden_dim, kernel_size=self.kernel_size, padding=self.padding, bias=False),
-                nn.LayerNorm([ hidden_dim,self.height, self.width])
+                nn.LayerNorm([hidden_dim, self.height, self.width])
             )
         else:
             self.conv_x = nn.Sequential(
@@ -74,9 +74,9 @@ class SpatioTemporalLSTMCell(nn.Module):
 
         return h_new, c_new, m_new
 
+
 if __name__ == '__main__':
     from configs.radar_train_configs import configs
-
 
     parse = configs()
     configs = parse.parse_args()
